@@ -1,13 +1,42 @@
+r = require 'rethinkdb'
 
+connection = null
+r.connect
+  host: process.env.RETHINKDB_HOST
+  port: process.env.RETHINKDB_PORT
+  authKey: process.env.RETHINKDB_AUTH
+  (err, conn) ->
+    throw err  if err
+    connection = conn
+
+# Routes
 module.exports =
   index: (req, res) ->
-    res.json ''
+    res.send 'You are Here :)<br /><br />- There'
     return
 
   home: (req, res) ->
-    res.json ''
+    r.table 'trash'
+      .filter r.row('postalCode').eq req.params.zip
+      .filter r.row('thoroughfare').eq req.params.streetName
+      .filter r.row('subThoroughfareRangeStart').le parseInt req.params.streetAddress
+      .filter r.row('subThoroughfareRangeEnd').ge parseInt req.params.streetAddress
+      .run connection, (err, cursor) ->
+        throw err  if err
+        cursor.toArray (err, result) ->
+          throw err  if err
+          res.json result
     return
 
   car: (req, res) ->
-    res.json ''
+    r.table 'park'
+      .filter r.row('postalCode').eq req.params.zip
+      .filter r.row('thoroughfare').eq req.params.streetName
+      .filter r.row('subThoroughfareRangeStart').le req.params.streetAddress
+      .filter r.row('subThoroughfareRangeEnd').ge req.params.streetAddress
+      .run connection, (err, cursor) ->
+        throw err  if err
+        cursor.toArray (err, result) ->
+          throw err  if err
+          res.json result
     return

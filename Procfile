@@ -1,1 +1,2 @@
-web: coffee app.coffee
+web: nodemon app.coffee
+data: rethinkdb -d data

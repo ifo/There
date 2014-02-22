@@ -21,8 +21,8 @@ app.use app.router
 app.use express.errorHandler()  if 'development' is app.get('env')
 
 app.get '/', routes.index
-app.get '/:zip/:streetName/reminders/home', routes.home
-app.get '/:zip/:streetName/reminders/car', routes.car
+app.get '/:zip/:streetName/:streetAddress/reminders/home', routes.home
+app.get '/:zip/:streetName/:streetAddress/reminders/car', routes.car
 
 http.createServer(app).listen app.get('port'), ->
   console.log 'Express server listening on port ' + app.get('port')
