@@ -42,3 +42,14 @@ module.exports =
           throw err  if err
           res.json result
     return
+
+  general: (req, res) ->
+    r.table 'reminders'
+      .hasFields 'locality'
+      .filter r.row('reminderType').eq 'home'
+      .run connection, (err, cursor) ->
+        throw err  if err
+        cursor.toArray (err, result) ->
+          throw err  if err
+          res.json result
+    return
