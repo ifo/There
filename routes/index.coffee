@@ -9,6 +9,24 @@ r.connect
     throw err  if err
     connection = conn
 
+reminderQuery = (table, thoroughfare, postalCode, reminderType, streetAddress) ->
+  addr = parseInt streetAddress
+  r.table table
+    .getAll thoroughfare, index: 'thoroughfare'
+    .filter r.row('postalCode').eq postalCode
+    .filter r.row('reminderType').eq reminderType
+    .filter r.row('subThoroughfareRangeStart').le addr
+    .filter r.row('subThoroughfareRangeEnd').ge addr
+
+authorQuery = (table, author) ->
+  r.table table
+    .getAll author, index: 'author'
+
+unionQuery = (table, thoroughfare, postalCode, reminderType, streetAddress, author) ->
+  start = reminderQuery table, thoroughfare, postalCode, reminderType, streetAddress
+  start.union authorQuery table, author
+
+
 # Routes
 module.exports =
   index: (req, res) ->
@@ -16,31 +34,25 @@ module.exports =
     return
 
   home: (req, res) ->
-    r.table 'reminders'
-      .getAll req.params.streetName, index: 'thoroughfare'
-      .filter r.row('postalCode').eq req.params.zip
-      .filter r.row('reminderType').eq 'home'
-      .filter r.row('subThoroughfareRangeStart').le parseInt req.params.streetAddress
-      .filter r.row('subThoroughfareRangeEnd').ge parseInt req.params.streetAddress
-      .run connection, (err, cursor) ->
+    query = reminderQuery 'reminders', req.params.streetName, req.params.zip, 'home', req.params.streetAddress
+    if req.query.author?
+      query = unionQuery 'reminders', req.params.streetName, req.params.zip, 'home', req.params.streetAddress, req.query.author
+    query.run connection, (err, cursor) ->
+      throw err  if err
+      cursor.toArray (err, result) ->
         throw err  if err
-        cursor.toArray (err, result) ->
-          throw err  if err
-          res.json result
+        res.json result
     return
 
   car: (req, res) ->
-    r.table 'reminders'
-      .getAll req.params.streetName, index: 'thoroughfare'
-      .filter r.row('postalCode').eq req.params.zip
-      .filter r.row('reminderType').eq 'car'
-      .filter r.row('subThoroughfareRangeStart').le req.params.streetAddress
-      .filter r.row('subThoroughfareRangeEnd').ge req.params.streetAddress
-      .run connection, (err, cursor) ->
+    query = reminderQuery 'reminders', req.params.streetName, req.params.zip, 'car', req.params.streetAddress
+    if req.query.author?
+      query = unionQuery 'reminders', req.params.streetName, req.params.zip, 'car', req.params.streetAddress, req.query.author
+    query.run connection, (err, cursor) ->
+      throw err  if err
+      cursor.toArray (err, result) ->
         throw err  if err
-        cursor.toArray (err, result) ->
-          throw err  if err
-          res.json result
+        res.json result
     return
 
   general: (req, res) ->
