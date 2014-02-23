@@ -53,3 +53,15 @@ module.exports =
           throw err  if err
           res.json result
     return
+
+  putReminder: (req, res) ->
+    if req.body.author
+      r.table 'reminders'
+        .insert req.body
+        .run connection, (err, result) ->
+          throw err  if err
+          res.json JSON.stringify(result).uuid
+      return
+    else
+      res.send 400, 'no author'
+      return
