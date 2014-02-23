@@ -18,13 +18,14 @@ reminderQuery = (table, thoroughfare, postalCode, reminderType, streetAddress) -
     .filter r.row('subThoroughfareRangeStart').le addr
     .filter r.row('subThoroughfareRangeEnd').ge addr
 
-authorQuery = (table, author) ->
+authorQuery = (table, author, reminderType) ->
   r.table table
     .getAll author, index: 'author'
+    .filter r.row('reminderType').eq reminderType
 
 unionQuery = (table, thoroughfare, postalCode, reminderType, streetAddress, author) ->
   start = reminderQuery table, thoroughfare, postalCode, reminderType, streetAddress
-  start.union authorQuery table, author
+  start.union authorQuery table, author, reminderType
 
 
 # Routes
