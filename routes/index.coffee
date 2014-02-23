@@ -19,6 +19,7 @@ module.exports =
     r.table 'reminders'
       .getAll req.params.streetName, index: 'thoroughfare'
       .filter r.row('postalCode').eq req.params.zip
+      .filter r.row('reminderType').eq 'home'
       .filter r.row('subThoroughfareRangeStart').le parseInt req.params.streetAddress
       .filter r.row('subThoroughfareRangeEnd').ge parseInt req.params.streetAddress
       .run connection, (err, cursor) ->
@@ -32,6 +33,7 @@ module.exports =
     r.table 'reminders'
       .getAll req.params.streetName, index: 'thoroughfare'
       .filter r.row('postalCode').eq req.params.zip
+      .filter r.row('reminderType').eq 'car'
       .filter r.row('subThoroughfareRangeStart').le req.params.streetAddress
       .filter r.row('subThoroughfareRangeEnd').ge req.params.streetAddress
       .run connection, (err, cursor) ->
