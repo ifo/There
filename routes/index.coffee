@@ -78,3 +78,13 @@ module.exports =
     else
       res.send 400, 'no author'
       return
+
+  deleteReminder: (req, res) ->
+    r.table 'reminders'
+      .get req.query.author, index: 'author'
+      .filter r.row('uuid').eq req.params.uuid
+      .destroy()
+      .run connection, (err, result) ->
+        throw err  if err
+        res.send "#{req.params.uuid} deleted"
+    return

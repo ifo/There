@@ -25,6 +25,7 @@ app.get '/:zip/:streetName/:streetAddress/reminders/home', routes.home
 app.get '/:zip/:streetName/:streetAddress/reminders/car', routes.car
 app.get '/:locality/reminders/home', routes.general
 app.put '/reminder', routes.putReminder
+app.delete '/reminder/:uuid', routes.deleteReminder
 
 http.createServer(app).listen app.get('port'), ->
   console.log 'Express server listening on port ' + app.get('port')
