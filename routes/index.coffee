@@ -5,6 +5,7 @@ r.connect
   host: process.env.RETHINKDB_HOST
   port: process.env.RETHINKDB_PORT
   authKey: process.env.RETHINKDB_AUTH
+  db: process.env.RETHINKDB_DB or 'test'
   (err, conn) ->
     throw err  if err
     connection = conn
